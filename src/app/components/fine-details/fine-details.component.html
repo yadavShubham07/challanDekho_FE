@@ -1,0 +1,24 @@
+<section class="fine-details">
+  <div class="container">
+    <h2>Traffic Violation Fines</h2>
+
+    <div class="fine-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Violation Type</th>
+            <th>Fine Amount</th>
+            <th>Additional Penalties</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fine of fineList">
+            <td>{{ fine.violation }}</td>
+            <td>₹{{ fine.amount }}</td>
+            <td>{{ fine.penalties }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

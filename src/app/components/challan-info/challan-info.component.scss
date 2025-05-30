@@ -1,0 +1,61 @@
+.challan-info {
+  padding: 4rem 0;
+  background: var(--neutral-100);
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--primary-dark);
+    
+    &:after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: var(--primary-color);
+      margin: 1rem auto 0;
+    }
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .info-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    h3 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    
+    ul, ol {
+      padding-left: 1.5rem;
+      
+      li {
+        margin-bottom: 0.5rem;
+        color: var(--neutral-700);
+      }
+    }
+    
+    p {
+      color: var(--neutral-700);
+      line-height: 1.6;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .challan-info {
+    padding: 2rem 0;
+    
+    .info-card {
+      padding: 1.5rem;
+    }
+  }
+}

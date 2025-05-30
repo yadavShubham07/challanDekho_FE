@@ -1,0 +1,35 @@
+<div class="login-modal">
+  <h2>Login to ChallanDekho</h2>
+
+  <div class="login-form" *ngIf="!showOtp">
+    <div class="form-group">
+      <label>Mobile Number</label>
+      <input
+        type="tel"
+        [(ngModel)]="mobileNumber"
+        placeholder="Enter your mobile number"
+        pattern="[0-9]{10}"
+        maxlength="10"
+      />
+    </div>
+    <button
+      class="submit-btn"
+      (click)="sendOtp()"
+      [disabled]="!isValidMobile()"
+    >
+      Get OTP
+    </button>
+  </div>
+
+  <div class="otp-form" *ngIf="showOtp">
+    <p>Enter OTP sent to {{ mobileNumber }}</p>
+    <!-- <ngx-otp-input
+      [config]="otpConfig"
+      (otpChange)="onOtpChange($event)">
+    </ngx-otp-input> -->
+    <button class="submit-btn" (click)="verifyOtp()" [disabled]="!isValidOtp()">
+      Verify OTP
+    </button>
+    <button class="resend-btn" (click)="resendOtp()">Resend OTP</button>
+  </div>
+</div>

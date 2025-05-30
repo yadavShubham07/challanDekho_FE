@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+out-tsc/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled source #
+*.js
+*.d.ts
+*.map
+
+# Optional npm cache directory
+.npm/
+
+# Angular environment files (if needed)
+src/environments/environment*.ts
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Angular cache
+.angular/cache/
+
+# Package-lock
+package-lock.json
