@@ -25,12 +25,12 @@ import { Component } from "@angular/core";
           </div>
           <div class="footer-section">
             <h5>Contact</h5>
-            <p><i class="fas fa-envelope"></i> support#echallanverify.com</p>
+            <p><i class="fas fa-envelope"></i> support&#64;challanDekho.com</p>
             <p><i class="fas fa-phone"></i> +91 123 456 7890</p>
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2025 E-Challan Verify. All Rights Reserved.</p>
+          <p>&copy; 2025 ChallanDekho. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

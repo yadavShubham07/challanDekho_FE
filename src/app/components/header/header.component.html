@@ -18,7 +18,23 @@
       >
       <a routerLink="/search" routerLinkActive="active">Check Challan</a>
       <a routerLink="/fines" routerLinkActive="active">Fine Details</a>
-      <button class="login-btn" (click)="openLoginModal()">Login</button>
+      <a routerLink="/about" routerLinkActive="active">About Us</a>
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        *ngIf="isAuthenticated"
+        >Dashboard</a
+      >
+      <button
+        class="login-btn"
+        (click)="openLoginModal()"
+        *ngIf="!isAuthenticated"
+      >
+        Login
+      </button>
+      <button class="logout-btn" (click)="logout()" *ngIf="isAuthenticated">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </div>
 </nav>

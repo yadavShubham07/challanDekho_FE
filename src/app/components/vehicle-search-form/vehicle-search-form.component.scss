@@ -1,0 +1,39 @@
+.vehicle-search-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .form-group {
+        position: relative;
+      }
+
+      .error-message {
+        color: var(--error-color);
+        font-size: 0.875rem;
+        margin-top: 4px;
+      }
+
+      .is-invalid {
+        border-color: var(--error-color);
+      }
+
+      .search-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .search-btn:disabled {
+        background-color: var(--neutral-400);
+        cursor: not-allowed;
+      }
+
+      .search-btn i {
+        font-size: 1rem;
+      }

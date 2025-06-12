@@ -75,4 +75,57 @@
       color: var(--neutral-600);
     }
   }
+
+  .otp-form {
+    text-align: center;
+    
+    p {
+      margin-bottom: 1.5rem;
+      color: var(--neutral-600);
+    }
+  }
+
+  :host ::ng-deep {
+    .otp-input-box {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .otp-input {
+      width: 3rem !important;
+      height: 3rem !important;
+      padding: 0.5rem;
+      font-size: 1.25rem;
+      text-align: center;
+      border: 2px solid var(--neutral-300);
+      border-radius: 8px;
+      background: white;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        outline: none;
+      }
+    }
+
+    .otp-filled {
+      border-color: var(--primary-color);
+    }
+
+    .otp-success {
+      border-color: var(--success-color);
+    }
+
+    .otp-error {
+      border-color: var(--error-color);
+    }
+
+    .otp-disabled {
+      background: var(--neutral-100);
+      cursor: not-allowed;
+    }
+  }
 }

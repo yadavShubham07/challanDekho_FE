@@ -1,0 +1,201 @@
+<div class="dashboard">
+  <div class="container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+      <div class="user-info">
+        <h1>Challan Dashboard</h1>
+        <p>Welcome back! Here are your vehicle challan details.</p>
+      </div>
+      <div class="user-actions">
+        <button class="btn-secondary" (click)="showProfile = !showProfile">
+          <i class="fas fa-user"></i> My Profile
+        </button>
+        <button class="btn-accent" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section card">
+      <h3>Search Another Vehicle</h3>
+      <div class="search-form">
+        <div class="form-group">
+          <input
+            type="text"
+            [(ngModel)]="searchVehicleNumber"
+            placeholder="Enter vehicle number (e.g., KL01AB1234)"
+            class="form-control"
+          />
+        </div>
+        <button
+          class="btn-primary"
+          (click)="searchNewVehicle()"
+          [disabled]="isSearching"
+        >
+          <i class="fas fa-search"></i>
+          <span *ngIf="!isSearching">Search</span>
+          <span *ngIf="isSearching">Searching...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Section (Collapsible) -->
+    <div *ngIf="showProfile" class="profile-section card fade-in">
+      <h3>Profile Information</h3>
+      <div class="profile-details">
+        <div class="profile-item">
+          <span class="label">Mobile Number:</span>
+          <span class="value">+91 98765 43210</span>
+        </div>
+        <div class="profile-item">
+          <span class="label">Last Login:</span>
+          <span class="value">{{ getCurrentDateTime() }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="label">Total Vehicles:</span>
+          <span class="value">1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading challan details...</p>
+    </div>
+
+    <!-- Challan Results -->
+    <div *ngIf="!loading && challans.length > 0" class="challans-section">
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card pending">
+          <div class="card-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="card-content">
+            <h4>{{ challans.length }}</h4>
+            <p>Pending Challans</p>
+          </div>
+        </div>
+        <div class="summary-card amount">
+          <div class="card-icon">
+            <i class="fas fa-rupee-sign"></i>
+          </div>
+          <div class="card-content">
+            <h4>₹{{ getTotalAmount() }}</h4>
+            <p>Total Fine Amount</p>
+          </div>
+        </div>
+        <div class="summary-card recent">
+          <div class="card-icon">
+            <i class="fas fa-calendar"></i>
+          </div>
+          <div class="card-content">
+            <h4>{{ getLatestChallanDate() }}</h4>
+            <p>Latest Challan</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Challan Table -->
+      <div class="challan-table-container card">
+        <div class="table-header">
+          <h3>Challan Details</h3>
+          <div class="table-actions">
+            <button class="btn-secondary" (click)="exportData()">
+              <i class="fas fa-download"></i> Export
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="challan-table">
+            <thead>
+              <tr>
+                <th>Challan No.</th>
+                <th>Date & Time</th>
+                <th>Location</th>
+                <th>Violations</th>
+                <th>Fine Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let challan of challans; trackBy: trackByChallanNo"
+                class="challan-row"
+              >
+                <td class="challan-number">
+                  <strong>{{ challan.challanNo }}</strong>
+                  <small>{{ challan.department }}</small>
+                </td>
+                <td class="challan-date">
+                  {{ formatDate(challan.challanDateTime) }}
+                </td>
+                <td class="challan-location">
+                  <div class="location-info">
+                    <span class="place">{{
+                      challan.challanPlace || "Not specified"
+                    }}</span>
+                    <small class="district">{{
+                      challan.rtoDistrictName
+                    }}</small>
+                  </div>
+                </td>
+                <td class="violations">
+                  <div class="violation-list">
+                    <div
+                      *ngFor="let offence of challan.offenceDetails"
+                      class="violation-item"
+                    >
+                      <span class="act-code">{{ offence.act }}</span>
+                      <span class="violation-desc">{{ offence.name }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="fine-amount">
+                  <span class="amount">₹{{ challan.fineImposed }}</span>
+                </td>
+                <td class="status">
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(challan.challanStatus)"
+                  >
+                    {{ challan.challanStatus }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <div class="action-buttons">
+                    <button
+                      class="btn-primary pay-btn"
+                      (click)="payChallan(challan)"
+                    >
+                      <i class="fas fa-credit-card"></i> Pay Now
+                    </button>
+                    <button
+                      class="btn-secondary view-btn"
+                      (click)="viewDetails(challan)"
+                    >
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Challans Found -->
+    <div *ngIf="!loading && challans.length === 0" class="no-challans card">
+      <div class="no-challans-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h3>No Pending Challans Found</h3>
+      <p>Great news! You don't have any pending challans at the moment.</p>
+    </div>
+  </div>
+</div>

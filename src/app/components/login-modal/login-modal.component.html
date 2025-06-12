@@ -23,11 +23,13 @@
 
   <div class="otp-form" *ngIf="showOtp">
     <p>Enter OTP sent to {{ mobileNumber }}</p>
-    <!-- <ngx-otp-input
-      [config]="otpConfig"
-      (otpChange)="onOtpChange($event)">
-    </ngx-otp-input> -->
-    <button class="submit-btn" (click)="verifyOtp()" [disabled]="!isValidOtp()">
+    <ngx-otp-input [config]="otpConfig" (otpChange)="onOtpChange($event)">
+    </ngx-otp-input>
+    <button
+      class="submit-btn"
+      [disabled]="!enableVerifyOtp"
+      (click)="verifyOtp()"
+    >
       Verify OTP
     </button>
     <button class="resend-btn" (click)="resendOtp()">Resend OTP</button>

@@ -28,6 +28,18 @@ export const routes: Routes = [
       ),
   },
   {
+    path: "dashboard",
+    loadComponent: () =>
+      import("./components/dashboard/dashboard.component").then(
+        (m) => m.DashboardComponent
+      ),
+  },
+  {
+    path: "about",
+    loadComponent: () =>
+      import("./pages/about/about.component").then((m) => m.AboutComponent),
+  },
+  {
     path: "**",
     redirectTo: "",
   },

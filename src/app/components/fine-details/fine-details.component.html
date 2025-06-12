@@ -1,24 +1,52 @@
 <section class="fine-details">
   <div class="container">
-    <h2>Traffic Violation Fines</h2>
+    <h2>Traffic Violation Penalties</h2>
+    <p class="section-description">
+      Stay informed about the latest traffic violations and their penalties in
+      India. Understanding these regulations helps ensure safer roads for
+      everyone.
+    </p>
 
-    <div class="fine-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Violation Type</th>
-            <th>Fine Amount</th>
-            <th>Additional Penalties</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let fine of fineList">
-            <td>{{ fine.violation }}</td>
-            <td>₹{{ fine.amount }}</td>
-            <td>{{ fine.penalties }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="fine-categories">
+      <div class="category-section">
+        <h3>Document-Related Offences</h3>
+        <div class="violations-grid">
+          <div class="violation-card" *ngFor="let offence of documentOffences">
+            <div class="violation-header">
+              <h4>{{ offence.violation }}</h4>
+              <span class="amount">₹{{ offence.amount }}</span>
+            </div>
+            <p class="description">{{ offence.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-section">
+        <h3>Driving-Related Offences</h3>
+        <div class="violations-grid">
+          <div class="violation-card" *ngFor="let offence of drivingOffences">
+            <div class="violation-header">
+              <h4>{{ offence.violation }}</h4>
+              <div class="amount-info">
+                <span class="amount">₹{{ offence.amount }}</span>
+                <span class="extra-charge" *ngIf="offence.extraCharge">{{
+                  offence.extraCharge
+                }}</span>
+              </div>
+            </div>
+            <p class="description">{{ offence.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note">
+      <i class="fas fa-info-circle"></i>
+      <p>
+        These penalties are applicable for two, three, four, and six-wheelers.
+        Penalties may vary based on state regulations and specific
+        circumstances.
+      </p>
     </div>
   </div>
 </section>

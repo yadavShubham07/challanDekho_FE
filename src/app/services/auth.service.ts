@@ -1,38 +1,38 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { BehaviorSubject, Observable, of } from "rxjs";
+import { environment } from "../../environment/environment"; // path to env file
+import { AuthStorageService } from "./authStorage.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  public isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  private baseUrl = environment.apiBaseUrl;
+
+  constructor(
+    private http: HttpClient,
+    private storageService: AuthStorageService
+  ) {}
 
   sendOtp(mobileNumber: string): Observable<any> {
-    // Mock API call
-    return of({ success: true }).pipe(
-      delay(1000),
-      tap(() => console.log(`OTP sent to ${mobileNumber}`))
-    );
+    let signupReq = { phoneNumber: mobileNumber };
+
+    return this.http.post(`${this.baseUrl}signup`, signupReq);
   }
 
   verifyOtp(mobileNumber: string, otp: string): Observable<any> {
-    // Mock API call
-    return of({ success: true }).pipe(
-      delay(1000),
-      tap(() => {
-        console.log(`OTP verified for ${mobileNumber}`);
-        this.isAuthenticatedSubject.next(true);
-      })
-    );
+    let signupReq = { phoneNumber: mobileNumber, otp: otp };
+
+    return this.http.post(`${this.baseUrl}otp`, signupReq);
   }
 
   logout(): void {
     this.isAuthenticatedSubject.next(false);
+    this.storageService.clear();
   }
 
   isAuthenticated(): boolean {
