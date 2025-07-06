@@ -48,7 +48,6 @@ export class LoginModalComponent {
   }
 
   isValidOtp(): boolean {
-    console.log("isvalid", this.otpArray);
     this.finalOtpString = this.otpArray.join("");
     return this.finalOtpString.length === 4;
   }
@@ -58,7 +57,6 @@ export class LoginModalComponent {
       this.authService.sendOtp(this.mobileNumber).subscribe({
         next: (data) => {
           if (data.status == true) {
-            console.log("otp sent");
             this.showOtp = true;
           }
         },
@@ -71,7 +69,6 @@ export class LoginModalComponent {
 
   onOtpChange(otp: any): void {
     this.otpArray = otp;
-    console.log("onotpchange", this.otpArray[3]);
     if (this.otpArray[3] && this.otpArray[3].length > 0) {
       this.enableVerifyOtp = true;
     } else {

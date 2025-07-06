@@ -10,31 +10,41 @@
       </a>
     </div>
     <div class="nav-links">
-      <a
-        routerLink="/"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        >Home</a
-      >
-      <a routerLink="/search" routerLinkActive="active">Check Challan</a>
-      <a routerLink="/fines" routerLinkActive="active">Fine Details</a>
-      <a routerLink="/about" routerLinkActive="active">About Us</a>
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="active"
-        *ngIf="isAuthenticated"
-        >Dashboard</a
-      >
-      <button
-        class="login-btn"
-        (click)="openLoginModal()"
-        *ngIf="!isAuthenticated"
-      >
-        Login
-      </button>
-      <button class="logout-btn" (click)="logout()" *ngIf="isAuthenticated">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </button>
+      <!-- Guest Navigation (when not logged in) -->
+      <ng-container *ngIf="!isAuthenticated">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >Home</a
+        >
+        <a routerLink="/search" routerLinkActive="active">Check Challan</a>
+        <a routerLink="/fines" routerLinkActive="active">Fine Details</a>
+        <a routerLink="/about" routerLinkActive="active">About Us</a>
+
+        <button
+          class="login-btn"
+          (click)="openLoginModal()"
+          *ngIf="!isAuthenticated"
+        >
+          Login
+        </button>
+      </ng-container>
+      <!-- Authenticated Navigation (when logged in) -->
+      <ng-container *ngIf="isAuthenticated">
+        <a
+          routerLink="/dashboard"
+          routerLinkActive="active"
+          *ngIf="isAuthenticated"
+          >Dashboard</a
+        >
+        <a routerLink="/fines" routerLinkActive="active">Fine Details</a>
+        <a routerLink="/about" routerLinkActive="active">About Us</a>
+
+        <button class="logout-btn" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </ng-container>
     </div>
   </div>
 </nav>

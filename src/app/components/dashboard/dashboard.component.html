@@ -1,201 +1,495 @@
-<div class="dashboard">
-  <div class="container">
+<div class="dashboard-container">
+  <div class="container py-4">
     <!-- Header Section -->
-    <div class="dashboard-header">
-      <div class="user-info">
-        <h1>Challan Dashboard</h1>
-        <p>Welcome back! Here are your vehicle challan details.</p>
-      </div>
-      <div class="user-actions">
-        <button class="btn-secondary" (click)="showProfile = !showProfile">
-          <i class="fas fa-user"></i> My Profile
-        </button>
-        <button class="btn-accent" (click)="logout()">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm gradient-bg text-white">
+          <div class="card-body p-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2 fw-bold">
+                  <i class="bi bi-speedometer2 me-2"></i>Challan Dashboard
+                </h2>
+                <p
+                  class="mb-0 opacity-90"
+                  *ngIf="
+                    vehicleNumberReceived && vehicleNumberReceived.length > 0
+                  "
+                >
+                  Welcome! Here are your challan details for
+                  {{ vehicleNumberReceived }}
+                </p>
+                <p *ngIf="showOnlyLoginSpecificLabels">
+                  Welcome! Enter vehicle number below to check for any pending
+                  challan(s).
+                </p>
+              </div>
+              <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex flex-column align-items-md-end">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-person-circle me-2 fs-5"></i>
+                    <span class="fw-medium">{{ getCurrentUserMobile() }}</span>
+                  </div>
+                  <small class="opacity-75"
+                    >Last updated: {{ getCurrentDateTime() }}</small
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Search Section -->
-    <div class="search-section card">
-      <h3>Search Another Vehicle</h3>
-      <div class="search-form">
-        <div class="form-group">
-          <input
-            type="text"
-            [(ngModel)]="searchVehicleNumber"
-            placeholder="Enter vehicle number (e.g., KL01AB1234)"
-            class="form-control"
-          />
-        </div>
-        <button
-          class="btn-primary"
-          (click)="searchNewVehicle()"
-          [disabled]="isSearching"
-        >
-          <i class="fas fa-search"></i>
-          <span *ngIf="!isSearching">Search</span>
-          <span *ngIf="isSearching">Searching...</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Profile Section (Collapsible) -->
-    <div *ngIf="showProfile" class="profile-section card fade-in">
-      <h3>Profile Information</h3>
-      <div class="profile-details">
-        <div class="profile-item">
-          <span class="label">Mobile Number:</span>
-          <span class="value">+91 98765 43210</span>
-        </div>
-        <div class="profile-item">
-          <span class="label">Last Login:</span>
-          <span class="value">{{ getCurrentDateTime() }}</span>
-        </div>
-        <div class="profile-item">
-          <span class="label">Total Vehicles:</span>
-          <span class="value">1</span>
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0 pb-0">
+            <h5 class="mb-0 fw-bold text-dark">
+              <i class="bi bi-lightning-charge text-primary me-2"></i>Quick
+              Actions
+            </h5>
+          </div>
+          <div class="card-body">
+            <form
+              class="row g-3"
+              (ngSubmit)="searchNewVehicle()"
+              #searchForm="ngForm"
+            >
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Vehicle Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="searchVehicleNumber"
+                  name="vehicleNumber"
+                  placeholder="e.g., KL01AB1234"
+                  style="text-transform: uppercase"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Mobile Number</label>
+                <div class="input-group">
+                  <span class="input-group-text">+91</span>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    [(ngModel)]="searchMobileNumber"
+                    name="mobileNumber"
+                    placeholder="Enter mobile number"
+                    maxlength="10"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  [disabled]="
+                    isSearching || !searchVehicleNumber || !searchMobileNumber
+                  "
+                >
+                  <span *ngIf="!isSearching">
+                    <i class="bi bi-search me-2"></i>Search Another Vehicle
+                  </span>
+                  <span *ngIf="isSearching">
+                    <span class="spinner-border spinner-border-sm me-2"></span
+                    >Searching...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>Loading challan details...</p>
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-custom mx-auto mb-3"></div>
+      <h5 class="text-muted">Loading your challan details...</h5>
+      <p class="text-muted">Please wait while we fetch your information</p>
     </div>
 
-    <!-- Challan Results -->
-    <div *ngIf="!loading && challans.length > 0" class="challans-section">
-      <!-- Summary Cards -->
-      <div class="summary-cards">
-        <div class="summary-card pending">
-          <div class="card-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-          </div>
-          <div class="card-content">
-            <h4>{{ challans.length }}</h4>
-            <p>Pending Challans</p>
-          </div>
-        </div>
-        <div class="summary-card amount">
-          <div class="card-icon">
-            <i class="fas fa-rupee-sign"></i>
-          </div>
-          <div class="card-content">
-            <h4>₹{{ getTotalAmount() }}</h4>
-            <p>Total Fine Amount</p>
-          </div>
-        </div>
-        <div class="summary-card recent">
-          <div class="card-icon">
-            <i class="fas fa-calendar"></i>
-          </div>
-          <div class="card-content">
-            <h4>{{ getLatestChallanDate() }}</h4>
-            <p>Latest Challan</p>
+    <!-- Summary Cards -->
+    <div
+      *ngIf="
+        !loading && (pendingChallans.length > 0 || disposedChallans.length > 0)
+      "
+      class="row g-4 mb-4"
+    >
+      <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div
+              class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+              style="width: 60px; height: 60px"
+            >
+              <i class="bi bi-exclamation-triangle text-warning fs-3"></i>
+            </div>
+            <h3 class="fw-bold text-warning mb-1">
+              {{ pendingChallans.length }}
+            </h3>
+            <p class="text-muted mb-0">Pending Challans</p>
           </div>
         </div>
       </div>
 
-      <!-- Challan Table -->
-      <div class="challan-table-container card">
-        <div class="table-header">
-          <h3>Challan Details</h3>
-          <div class="table-actions">
-            <button class="btn-secondary" (click)="exportData()">
-              <i class="fas fa-download"></i> Export
-            </button>
+      <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div
+              class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+              style="width: 60px; height: 60px"
+            >
+              <i class="bi bi-check-circle text-success fs-3"></i>
+            </div>
+            <h3 class="fw-bold text-success mb-1">
+              {{ disposedChallans.length }}
+            </h3>
+            <p class="text-muted mb-0">Disposed Challans</p>
           </div>
         </div>
+      </div>
 
-        <div class="table-responsive">
-          <table class="challan-table">
-            <thead>
-              <tr>
-                <th>Challan No.</th>
-                <th>Date & Time</th>
-                <th>Location</th>
-                <th>Violations</th>
-                <th>Fine Amount</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="let challan of challans; trackBy: trackByChallanNo"
-                class="challan-row"
-              >
-                <td class="challan-number">
-                  <strong>{{ challan.challanNo }}</strong>
-                  <small>{{ challan.department }}</small>
-                </td>
-                <td class="challan-date">
-                  {{ formatDate(challan.challanDateTime) }}
-                </td>
-                <td class="challan-location">
-                  <div class="location-info">
-                    <span class="place">{{
-                      challan.challanPlace || "Not specified"
-                    }}</span>
-                    <small class="district">{{
-                      challan.rtoDistrictName
-                    }}</small>
-                  </div>
-                </td>
-                <td class="violations">
-                  <div class="violation-list">
-                    <div
-                      *ngFor="let offence of challan.offenceDetails"
-                      class="violation-item"
-                    >
-                      <span class="act-code">{{ offence.act }}</span>
-                      <span class="violation-desc">{{ offence.name }}</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="fine-amount">
-                  <span class="amount">₹{{ challan.fineImposed }}</span>
-                </td>
-                <td class="status">
-                  <span
-                    class="status-badge"
-                    [ngClass]="getStatusClass(challan.challanStatus)"
+      <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div
+              class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+              style="width: 60px; height: 60px"
+            >
+              <i class="bi bi-currency-rupee text-danger fs-3"></i>
+            </div>
+            <h3 class="fw-bold text-danger mb-1">
+              ₹{{ getTotalPendingAmount() | number }}
+            </h3>
+            <p class="text-muted mb-0">Pending Amount</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div
+              class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+              style="width: 60px; height: 60px"
+            >
+              <i class="bi bi-calendar-event text-info fs-3"></i>
+            </div>
+            <h6 class="fw-bold text-info mb-1">{{ getLatestChallanDate() }}</h6>
+            <p class="text-muted mb-0">Latest Challan</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div
+      *ngIf="
+        !loading && (pendingChallans.length > 0 || disposedChallans.length > 0)
+      "
+      class="row mb-4"
+    >
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab === 'pending'"
+                  (click)="setActiveTab('pending')"
+                  type="button"
+                >
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  Pending Challans ({{ pendingChallans.length }})
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab === 'disposed'"
+                  (click)="setActiveTab('disposed')"
+                  type="button"
+                >
+                  <i class="bi bi-check-circle me-2"></i>
+                  Disposed Challans ({{ disposedChallans.length }})
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Challans Table -->
+    <div
+      *ngIf="!loading && activeTab === 'pending' && pendingChallans.length > 0"
+      class="row"
+    >
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div
+            class="card-header bg-white border-0 d-flex justify-content-between align-items-center"
+          >
+            <h5 class="mb-0 fw-bold text-dark">
+              <i class="bi bi-exclamation-triangle text-warning me-2"></i
+              >Pending Challans
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th class="border-0">Challan Details</th>
+                    <th class="border-0">Date & Time</th>
+                    <th class="border-0">Location</th>
+                    <th class="border-0">Violations</th>
+                    <th class="border-0">Fine Amount</th>
+                    <th class="border-0">Status</th>
+                    <th class="border-0 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="
+                      let challan of pendingChallans;
+                      trackBy: trackByChallanNo
+                    "
+                    class="align-middle"
                   >
-                    {{ challan.challanStatus }}
-                  </span>
-                </td>
-                <td class="actions">
-                  <div class="action-buttons">
-                    <button
-                      class="btn-primary pay-btn"
-                      (click)="payChallan(challan)"
-                    >
-                      <i class="fas fa-credit-card"></i> Pay Now
-                    </button>
-                    <button
-                      class="btn-secondary view-btn"
-                      (click)="viewDetails(challan)"
-                    >
-                      <i class="fas fa-eye"></i> View
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    <td>
+                      <div>
+                        <div class="fw-bold text-primary">
+                          {{ challan.challanNo }}
+                        </div>
+                        <small class="text-muted">{{
+                          challan.department
+                        }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="fw-medium">
+                        {{ formatDate(challan.challanDateTime) }}
+                      </div>
+                      <small class="text-muted">{{
+                        formatTime(challan.challanDateTime)
+                      }}</small>
+                    </td>
+                    <td>
+                      <div>
+                        <div class="fw-medium">
+                          {{ challan.challanPlace || "Not specified" }}
+                        </div>
+                        <small class="text-muted">{{
+                          challan.rtoDistrictName
+                        }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="violations-cell">
+                        <div
+                          *ngFor="let offence of challan.offenceDetails"
+                          class="mb-1"
+                        >
+                          <span
+                            class="badge bg-light text-dark border me-1"
+                            *ngIf="offence.act"
+                            >{{ offence.act }}</span
+                          >
+                          <small class="text-muted d-block"
+                            >{{ offence.name | slice : 0 : 50
+                            }}{{ offence.name.length > 50 ? "..." : "" }}</small
+                          >
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="fw-bold text-danger fs-6"
+                        >₹{{ challan.fineImposed | number }}</span
+                      >
+                    </td>
+                    <td>
+                      <span class="badge bg-warning text-dark">
+                        <i class="bi bi-clock me-1"></i
+                        >{{ challan.challanStatus }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="btn-group-vertical btn-group-sm" role="group">
+                        <button
+                          class="btn btn-success btn-sm mb-1"
+                          (click)="payChallan(challan)"
+                        >
+                          <i class="bi bi-credit-card me-1"></i>Pay Now
+                        </button>
+                        <button
+                          class="btn btn-outline-primary btn-sm"
+                          (click)="viewDetails(challan)"
+                        >
+                          <i class="bi bi-eye me-1"></i>Details
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disposed Challans Table -->
+    <div
+      *ngIf="
+        !loading && activeTab === 'disposed' && disposedChallans.length > 0
+      "
+      class="row"
+    >
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div
+            class="card-header bg-white border-0 d-flex justify-content-between align-items-center"
+          >
+            <h5 class="mb-0 fw-bold text-dark">
+              <i class="bi bi-check-circle text-success me-2"></i>Disposed
+              Challans
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th class="border-0">Challan Details</th>
+                    <th class="border-0">Date & Time</th>
+                    <th class="border-0">Location</th>
+                    <th class="border-0">Violations</th>
+                    <th class="border-0">Fine Amount</th>
+                    <th class="border-0">Status</th>
+                    <th class="border-0 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="
+                      let challan of disposedChallans;
+                      trackBy: trackByChallanNo
+                    "
+                    class="align-middle"
+                  >
+                    <td>
+                      <div>
+                        <div class="fw-bold text-success">
+                          {{ challan.challanNo }}
+                        </div>
+                        <small class="text-muted">{{
+                          challan.department
+                        }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="fw-medium">
+                        {{ formatDate(challan.challanDateTime) }}
+                      </div>
+                      <small class="text-muted">{{
+                        formatTime(challan.challanDateTime)
+                      }}</small>
+                    </td>
+                    <td>
+                      <div>
+                        <div class="fw-medium">
+                          {{ challan.challanPlace || "Not specified" }}
+                        </div>
+                        <small class="text-muted">{{
+                          challan.rtoDistrictName || "N/A"
+                        }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="violations-cell">
+                        <div
+                          *ngFor="let offence of challan.offenceDetails"
+                          class="mb-1"
+                        >
+                          <span
+                            class="badge bg-light text-dark border me-1"
+                            *ngIf="offence.act"
+                            >{{ offence.act }}</span
+                          >
+                          <small class="text-muted d-block"
+                            >{{ offence.name | slice : 0 : 50
+                            }}{{ offence.name.length > 50 ? "..." : "" }}</small
+                          >
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="fw-bold text-success fs-6"
+                        >₹{{ challan.fineImposed | number }}</span
+                      >
+                    </td>
+                    <td>
+                      <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i
+                        >{{ challan.challanStatus }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button
+                        class="btn btn-outline-primary btn-sm"
+                        (click)="viewDetails(challan)"
+                      >
+                        <i class="bi bi-eye me-1"></i>View Details
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- No Challans Found -->
-    <div *ngIf="!loading && challans.length === 0" class="no-challans card">
-      <div class="no-challans-icon">
-        <i class="fas fa-check-circle"></i>
+    <div
+      *ngIf="
+        !loading &&
+        pendingChallans.length === 0 &&
+        disposedChallans.length === 0
+      "
+      class="row"
+    >
+      <div class="col-12">
+        <div class="card border-0 shadow-sm text-center py-5">
+          <div class="card-body">
+            <div
+              class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+              style="width: 100px; height: 100px"
+            >
+              <i
+                class="bi bi-check-circle text-success"
+                style="font-size: 3rem"
+              ></i>
+            </div>
+            <h3 class="fw-bold text-success mb-3">No Challans Found!</h3>
+            <p class="text-muted mb-4">
+              Great news! You don't have any traffic challans at the moment.
+            </p>
+            <button class="btn btn-primary" (click)="searchNewVehicle()">
+              <i class="bi bi-search me-2"></i>Search Another Vehicle
+            </button>
+          </div>
+        </div>
       </div>
-      <h3>No Pending Challans Found</h3>
-      <p>Great news! You don't have any pending challans at the moment.</p>
     </div>
   </div>
 </div>

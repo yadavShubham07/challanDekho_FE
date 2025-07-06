@@ -1,10 +1,13 @@
 import { Routes } from "@angular/router";
+import { AuthGuard } from "./guards/auth.guard";
+import { GuestGuard } from "./guards/guest.guard";
 
 export const routes: Routes = [
   {
     path: "",
     loadComponent: () =>
       import("./pages/home/home.component").then((m) => m.HomeComponent),
+    canActivate: [GuestGuard], // Only accessible when not logged in
   },
   {
     path: "search",
@@ -12,6 +15,7 @@ export const routes: Routes = [
       import("./pages/challan-search/challan-search.component").then(
         (m) => m.ChallanSearchComponent
       ),
+    canActivate: [GuestGuard], // Only accessible when not logged in
   },
   {
     path: "results",
@@ -19,6 +23,7 @@ export const routes: Routes = [
       import("./pages/challan-results/challan-results.component").then(
         (m) => m.ChallanResultsComponent
       ),
+    canActivate: [GuestGuard], // Only accessible when not logged in
   },
   {
     path: "fines",
@@ -33,6 +38,7 @@ export const routes: Routes = [
       import("./components/dashboard/dashboard.component").then(
         (m) => m.DashboardComponent
       ),
+    canActivate: [AuthGuard], // Protected route - requires authentication
   },
   {
     path: "about",

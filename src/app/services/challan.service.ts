@@ -15,9 +15,8 @@ export class ChallanService {
   constructor(private http: HttpClient) {}
 
   searchChallan(vehicleNumber: string): Observable<any> {
-    const params = new HttpParams().set("rcNumber", vehicleNumber);
-
-    return this.http.get(`${this.baseUrl}fetchChallans`, { params });
+    let vehicleDetails = { vehicleNumber: vehicleNumber };
+    return this.http.post(`${this.baseUrl}fetchChallans`, vehicleDetails);
   }
 
   setSearchResults(results: ChallanSearchResult): void {

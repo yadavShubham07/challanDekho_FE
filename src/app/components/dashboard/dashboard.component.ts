@@ -15,13 +15,20 @@ import { ActivatedRoute } from "@angular/router";
   styleUrl: "./dashboard.component.css",
 })
 export class DashboardComponent implements OnInit {
-  challans: ChallanDetail[] = [];
+  pendingChallans: ChallanDetail[] = [];
+  disposedChallans: ChallanDetail[] = [];
   loading = true;
-  showProfile = false;
   searchVehicleNumber = "";
+  searchMobileNumber = "";
   isSearching = false;
+  activeTab = "pending";
+  challans: ChallanDetail[] = [];
+  showProfile = false;
+  searchNewVehicleNumber = "";
+  vehicleNumberReceived = "";
 
   mobileNumber: string | null = "";
+  showOnlyLoginSpecificLabels: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -34,19 +41,44 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.mobileNumber = this.storageService.getPhoneNumber();
     this.route.queryParams.subscribe((params) => {
-      this.searchVehicleNumber = params["vehicle"];
-      if (this.searchVehicleNumber) {
-        this.fetchChallanDetails();
+      console.log("inisde route", params);
+      this.vehicleNumberReceived = params["vehicle"];
+      if (this.vehicleNumberReceived) {
+        console.log("vehicleNo recvd");
+        this.fetchChallanDetails(this.vehicleNumberReceived);
+      } else {
+        this.showOnlyLoginSpecificLabels = true;
       }
     });
   }
 
-  fetchChallanDetails() {
-    this.challanService
-      .searchChallan(this.searchVehicleNumber)
-      .subscribe((data) => {
-        console.log("challan res", data);
-      });
+  fetchChallanDetails(vehicleNo: string) {
+    this.loading = true;
+    this.challanService.searchChallan(vehicleNo).subscribe({
+      next: (response) => {
+        //this.challans = response.data;
+        this.challans = response.data.pendingData;
+        //this.disposedChallans = response.data.disposedData;
+        this.loading = false;
+        this.isSearching = false;
+        this.searchNewVehicleNumber = "";
+        console.log("data", this.pendingChallans);
+      },
+      error: (err) => {
+        this.loading = false;
+        console.log("error", err);
+      },
+    });
+  }
+
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
+  }
+
+  getTotalPendingAmount(): number {
+    return this.pendingChallans.reduce((total, challan) => {
+      return total + parseInt(challan.fineImposed || "0");
+    }, 0);
   }
 
   getTotalAmount(): number {
@@ -56,9 +88,10 @@ export class DashboardComponent implements OnInit {
   }
 
   getLatestChallanDate(): string {
-    if (this.challans.length === 0) return "N/A";
+    const allChallans = [...this.pendingChallans, ...this.disposedChallans];
+    if (allChallans.length === 0) return "N/A";
 
-    const latest = this.challans.reduce((latest, current) => {
+    const latest = allChallans.reduce((latest, current) => {
       const currentDate = new Date(current.challanDateTime);
       const latestDate = new Date(latest.challanDateTime);
       return currentDate > latestDate ? current : latest;
@@ -69,7 +102,7 @@ export class DashboardComponent implements OnInit {
 
   formatDate(dateString: string): string {
     try {
-      const [datePart, timePart] = dateString.split(" ");
+      const [datePart] = dateString.split(" ");
       const [day, month, year] = datePart.split("-");
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
@@ -83,14 +116,22 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  formatTime(dateString: string): string {
+    try {
+      const [, timePart] = dateString.split(" ");
+      return timePart;
+    } catch {
+      return "";
+    }
+  }
+
   getCurrentDateTime(): string {
     return new Date().toLocaleString("en-IN");
   }
 
-  getStatusClass(status: string): string {
-    return status.toLowerCase() === "pending"
-      ? "status-pending"
-      : "status-paid";
+  getCurrentUserMobile(): string {
+    const number = this.storageService.getPhoneNumber();
+    return number ? `+91 ${number}` : "User";
   }
 
   trackByChallanNo(index: number, challan: ChallanDetail): string {
@@ -99,27 +140,27 @@ export class DashboardComponent implements OnInit {
 
   payChallan(challan: ChallanDetail): void {
     console.log("Pay challan:", challan.challanNo);
-    // Implement payment logic
+    alert(
+      `Payment gateway would open for Challan: ${challan.challanNo}\nAmount: ₹${challan.fineImposed}`
+    );
   }
 
   viewDetails(challan: ChallanDetail): void {
     console.log("View details:", challan);
-    // Implement view details logic
+    alert(`Detailed view for Challan: ${challan.challanNo}`);
   }
 
-  searchNewVehicle(): void {
-    if (!this.searchVehicleNumber) {
-      return;
-    }
+  getStatusClass(status: string): string {
+    return status.toLowerCase() === "pending"
+      ? "status-pending"
+      : "status-paid";
+  }
 
-    this.isSearching = true;
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Searching for:", this.searchVehicleNumber);
-      this.isSearching = false;
-      // Reset form
-      this.searchVehicleNumber = "";
-    }, 2000);
+  searchNewVehicleDetails(): void {
+    if (!this.searchNewVehicleNumber) {
+      this.isSearching = true;
+      this.fetchChallanDetails(this.searchNewVehicleNumber);
+    }
   }
 
   exportData(): void {
@@ -130,5 +171,24 @@ export class DashboardComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(["/"]);
+  }
+
+  searchNewVehicle(): void {
+    if (!this.searchVehicleNumber || !this.searchMobileNumber) {
+      return;
+    }
+
+    this.isSearching = true;
+    setTimeout(() => {
+      console.log(
+        "Searching for:",
+        this.searchVehicleNumber,
+        this.searchMobileNumber
+      );
+      this.isSearching = false;
+      this.searchVehicleNumber = "";
+      this.searchMobileNumber = "";
+      alert("Search completed! New results would be displayed here.");
+    }, 2000);
   }
 }

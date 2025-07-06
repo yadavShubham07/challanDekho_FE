@@ -1,6 +1,11 @@
 /* Global Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Bootstrap Import */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+
 :root {
   --primary-color: #1976D2;
   --primary-light: #64B5F6;
@@ -148,7 +153,6 @@ button {
   border: 1px solid var(--neutral-300);
   border-radius: var(--border-radius);
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
   transition: var(--transition);
 }
 
