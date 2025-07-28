@@ -1,26 +1,33 @@
 import { Component } from "@angular/core";
-
+import { RouterModule } from "@angular/router";
 @Component({
   selector: "app-footer",
   standalone: true,
+  imports: [RouterModule],
   template: `
     <footer class="footer">
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">
-            <h5>ChallanDekho</h5>
+            <div class="brand">
+              <i class="icon-shield"></i>
+              <h3>ChallanDekho</h3>
+            </div>
             <p>
-              Check and verify challan details against your vehicle registration
-              number.
+              Your trusted platform for checking and managing traffic challan
+              details. Stay informed, stay compliant.
             </p>
           </div>
           <div class="footer-section">
             <h5>Quick Links</h5>
             <ul class="footer-links">
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#" routerLink="/about">About Us</a></li>
+              <li>
+                <a href="#" routerLink="/privacy-policy">Privacy Policy</a>
+              </li>
+              <li>
+                <a href="#" routerLink="/terms-of-service">Terms of Service</a>
+              </li>
             </ul>
           </div>
           <div class="footer-section">
@@ -42,6 +49,26 @@ import { Component } from "@angular/core";
         color: white;
         padding: 40px 0 16px;
         margin-top: 40px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        .icon-shield::before {
+          content: "🛡️";
+          font-size: 2rem;
+          margin-right: 0.5rem;
+        }
+
+        h3 {
+          margin: 0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
       }
 
       .footer-content {

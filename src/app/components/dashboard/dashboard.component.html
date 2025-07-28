@@ -1,108 +1,90 @@
 <div class="dashboard-container">
   <div class="container py-4">
     <!-- Header Section -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm gradient-bg text-white">
-          <div class="card-body p-4">
-            <div class="row align-items-center">
-              <div class="col-md-8">
-                <h2 class="mb-2 fw-bold">
-                  <i class="bi bi-speedometer2 me-2"></i>Challan Dashboard
-                </h2>
-                <p
-                  class="mb-0 opacity-90"
-                  *ngIf="
-                    vehicleNumberReceived && vehicleNumberReceived.length > 0
-                  "
-                >
-                  Welcome! Here are your challan details for
-                  {{ vehicleNumberReceived }}
-                </p>
-                <p *ngIf="showOnlyLoginSpecificLabels">
-                  Welcome! Enter vehicle number below to check for any pending
-                  challan(s).
-                </p>
-              </div>
-              <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <div class="d-flex flex-column align-items-md-end">
-                  <div class="d-flex align-items-center mb-2">
-                    <i class="bi bi-person-circle me-2 fs-5"></i>
-                    <span class="fw-medium">{{ getCurrentUserMobile() }}</span>
-                  </div>
-                  <small class="opacity-75"
-                    >Last updated: {{ getCurrentDateTime() }}</small
-                  >
-                </div>
-              </div>
-            </div>
+    <div class="dashboard-header">
+      <div class="user-info cd_pt-2">
+        <h1>Challan Dashboard</h1>
+        <p *ngIf="vehicleNumberReceived && vehicleNumberReceived.length > 0">
+          Welcome! Here are your challan details for
+          {{ vehicleNumberReceived }}
+        </p>
+        <p *ngIf="showOnlyLoginSpecificLabels">
+          Welcome! Enter vehicle number below to check for any pending
+          challan(s).
+        </p>
+      </div>
+      <div class="user-actions">
+        <button class="btn-secondary" (click)="showProfile = !showProfile">
+          <i class="fas fa-user"></i> My Profile
+        </button>
+        <!-- <button class="btn-accent" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button> -->
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section card">
+      <h3 *ngIf="!showOnlyLoginSpecificLabels">Search Another Vehicle</h3>
+      <div class="row">
+        <div class="col-4">
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            [class.is-invalid]="isVehicleNumberInvalid()"
+            [(ngModel)]="searchNewVehicleNumber"
+            name="vehicleNumber"
+            placeholder="e.g., KL01AB1234"
+            style="text-transform: uppercase"
+            pattern="^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$"
+            maxlength="10"
+            #vehicleNumberInput="ngModel"
+            required
+          />
+          <div *ngIf="isVehicleNumberInvalid()" class="invalid-feedback">
+            <span
+              *ngIf="vehicleNumberInput.errors?.['required'] && vehicleNumberInput.touched"
+            >
+              <i class="bi bi-exclamation-circle me-1"></i>Vehicle number is
+              required
+            </span>
+            <span
+              *ngIf="vehicleNumberInput.errors?.['pattern'] && vehicleNumberInput.value"
+            >
+              <i class="bi bi-exclamation-circle me-1"></i>Please enter a valid
+              vehicle number (e.g., KL01AB1234)
+            </span>
           </div>
+        </div>
+        <div class="col-3">
+          <button
+            class="btn-primary"
+            (click)="searchNewVehicleDetails()"
+            [disabled]="isSearching"
+          >
+            <i class="fas fa-search"></i>
+            <span *ngIf="!isSearching">Search</span>
+            <span *ngIf="isSearching">Searching...</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-0 pb-0">
-            <h5 class="mb-0 fw-bold text-dark">
-              <i class="bi bi-lightning-charge text-primary me-2"></i>Quick
-              Actions
-            </h5>
-          </div>
-          <div class="card-body">
-            <form
-              class="row g-3"
-              (ngSubmit)="searchNewVehicle()"
-              #searchForm="ngForm"
-            >
-              <div class="col-md-4">
-                <label class="form-label fw-medium">Vehicle Number</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="searchVehicleNumber"
-                  name="vehicleNumber"
-                  placeholder="e.g., KL01AB1234"
-                  style="text-transform: uppercase"
-                  required
-                />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label fw-medium">Mobile Number</label>
-                <div class="input-group">
-                  <span class="input-group-text">+91</span>
-                  <input
-                    type="tel"
-                    class="form-control"
-                    [(ngModel)]="searchMobileNumber"
-                    name="mobileNumber"
-                    placeholder="Enter mobile number"
-                    maxlength="10"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="col-md-4 d-flex align-items-end">
-                <button
-                  type="submit"
-                  class="btn btn-primary w-100"
-                  [disabled]="
-                    isSearching || !searchVehicleNumber || !searchMobileNumber
-                  "
-                >
-                  <span *ngIf="!isSearching">
-                    <i class="bi bi-search me-2"></i>Search Another Vehicle
-                  </span>
-                  <span *ngIf="isSearching">
-                    <span class="spinner-border spinner-border-sm me-2"></span
-                    >Searching...
-                  </span>
-                </button>
-              </div>
-            </form>
-          </div>
+    <!-- Profile Section (Collapsible) -->
+    <div *ngIf="showProfile" class="profile-section card fade-in">
+      <h3>Profile Information</h3>
+      <div class="profile-details">
+        <div class="profile-item">
+          <span class="label">Mobile Number:</span>
+          <span class="value">+91 98765 43210</span>
+        </div>
+        <div class="profile-item">
+          <span class="label">Last Login:</span>
+          <span class="value">{{ getCurrentDateTime() }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="label">Total Vehicles:</span>
+          <span class="value">1</span>
         </div>
       </div>
     </div>
@@ -112,6 +94,90 @@
       <div class="spinner-custom mx-auto mb-3"></div>
       <h5 class="text-muted">Loading your challan details...</h5>
       <p class="text-muted">Please wait while we fetch your information</p>
+    </div>
+
+    <div *ngIf="!hasSearchedVehicles && !loading" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0">
+            <h5 class="mb-0 fw-bold text-dark">
+              <i class="bi bi-lightbulb text-warning me-2"></i>Helpful Tips
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="d-flex">
+                  <div
+                    class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style="width: 40px; height: 40px"
+                  >
+                    <i class="bi bi-card-text text-info"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Vehicle Number Format</h6>
+                    <p class="text-muted mb-0 small">
+                      Enter in format: KL01AB1234 (State Code + District +
+                      Series + Number)
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex">
+                  <div
+                    class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style="width: 40px; height: 40px"
+                  >
+                    <i class="bi bi-shield-check text-success"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Data Security</h6>
+                    <p class="text-muted mb-0 small">
+                      Your information is encrypted and secure. We don't store
+                      personal data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex">
+                  <div
+                    class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style="width: 40px; height: 40px"
+                  >
+                    <i class="bi bi-clock text-warning"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Real-time Updates</h6>
+                    <p class="text-muted mb-0 small">
+                      Get the latest challan status directly from government
+                      databases.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex">
+                  <div
+                    class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style="width: 40px; height: 40px"
+                  >
+                    <i class="bi bi-credit-card text-primary"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1">Easy Payments</h6>
+                    <p class="text-muted mb-0 small">
+                      Pay your challans online securely with multiple payment
+                      options.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Summary Cards -->
@@ -460,14 +526,7 @@
     </div>
 
     <!-- No Challans Found -->
-    <div
-      *ngIf="
-        !loading &&
-        pendingChallans.length === 0 &&
-        disposedChallans.length === 0
-      "
-      class="row"
-    >
+    <div *ngIf="!loading && noPendingChallans" class="row">
       <div class="col-12">
         <div class="card border-0 shadow-sm text-center py-5">
           <div class="card-body">
@@ -484,12 +543,195 @@
             <p class="text-muted mb-4">
               Great news! You don't have any traffic challans at the moment.
             </p>
-            <button class="btn btn-primary" (click)="searchNewVehicle()">
-              <i class="bi bi-search me-2"></i>Search Another Vehicle
-            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Challan Details Modal -->
+<div
+  class="modal fade"
+  [class.show]="showDetailsModal"
+  [style.display]="showDetailsModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="challanDetailsModalLabel"
+  aria-hidden="true"
+  *ngIf="showDetailsModal && selectedChallan"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header gradient-bg text-white">
+        <h5 class="modal-title fw-bold" id="challanDetailsModalLabel">
+          <i class="bi bi-file-text me-2"></i>Challan Details -
+          {{ selectedChallan.challanNo }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeDetailsModal()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Basic Challan Information -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h6 class="card-title text-primary mb-3">
+                  <i class="bi bi-info-circle me-2"></i>Basic Information
+                </h6>
+                <div class="mb-2">
+                  <strong>Challan Number:</strong>
+                  {{ selectedChallan.challanNo }}
+                </div>
+                <div class="mb-2">
+                  <strong>Date & Time:</strong>
+                  {{ formatDate(selectedChallan.challanDateTime) }} at
+                  {{ formatTime(selectedChallan.challanDateTime) }}
+                </div>
+                <div class="mb-2">
+                  <strong>Location:</strong>
+                  {{ selectedChallan.challanPlace || "Not specified" }}
+                </div>
+                <div class="mb-2">
+                  <strong>District:</strong>
+                  {{ selectedChallan.rtoDistrictName || "N/A" }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h6 class="card-title text-success mb-3">
+                  <i class="bi bi-currency-rupee me-2"></i>Fine Information
+                </h6>
+                <div class="mb-2">
+                  <strong>Fine Amount:</strong>
+                  <span class="text-danger fs-5 fw-bold"
+                    >₹{{ selectedChallan.fineImposed | number }}</span
+                  >
+                </div>
+                <div class="mb-2">
+                  <strong>Status:</strong>
+                  <span
+                    class="badge"
+                    [class]="
+                      selectedChallan.challanStatus === 'Pending'
+                        ? 'bg-warning text-dark'
+                        : 'bg-success'
+                    "
+                  >
+                    {{ selectedChallan.challanStatus }}
+                  </span>
+                </div>
+                <div class="mb-2">
+                  <strong>Department:</strong> {{ selectedChallan.department }}
+                </div>
+                <div class="mb-2">
+                  <strong>Owner Name:</strong> {{ selectedChallan.ownerName }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offence Details -->
+        <div class="card border-0">
+          <div class="card-header bg-primary text-white">
+            <h6 class="mb-0 fw-bold">
+              <i class="bi bi-exclamation-triangle me-2"></i>Violation Details /
+              उल्लंघन विवरण
+            </h6>
+          </div>
+          <div class="card-body">
+            <div
+              *ngFor="
+                let offence of selectedChallan.offenceDetails;
+                let i = index
+              "
+              class="offence-item mb-4"
+            >
+              <div class="d-flex align-items-start mb-3">
+                <div
+                  class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                  style="width: 30px; height: 30px"
+                >
+                  <span class="fw-bold text-primary">{{ i + 1 }}</span>
+                </div>
+                <div class="flex-grow-1">
+                  <div *ngIf="offence.act" class="mb-2">
+                    <span class="badge bg-secondary">{{ offence.act }}</span>
+                  </div>
+
+                  <!-- Hindi Content -->
+                  <div class="hindi-content mb-3 p-3 bg-light rounded">
+                    <h6 class="text-primary mb-2">
+                      <i class="bi bi-translate me-2"></i>हिंदी में विवरण:
+                    </h6>
+                    <p
+                      class="mb-0 fw-medium"
+                      style="font-size: 1.1rem; line-height: 1.6"
+                    >
+                      {{ getOffenceDetailsInHindi(offence.name) }}
+                    </p>
+                  </div>
+
+                  <!-- Line Break -->
+                  <hr class="my-3" />
+
+                  <!-- English Content -->
+                  <div class="english-content">
+                    <h6 class="text-success mb-2">
+                      <i class="bi bi-globe me-2"></i>English Description:
+                    </h6>
+                    <p class="mb-0" style="line-height: 1.6">
+                      {{ offence.name }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Separator between offences -->
+              <div
+                *ngIf="i < selectedChallan.offenceDetails.length - 1"
+                class="border-bottom mb-4"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDetailsModal()"
+        >
+          <i class="bi bi-x-circle me-2"></i>Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          *ngIf="selectedChallan.challanStatus === 'Pending'"
+          (click)="payChallan(selectedChallan)"
+        >
+          <i class="bi bi-credit-card me-2"></i>Pay Now - ₹{{
+            selectedChallan.fineImposed | number
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  class="modal-backdrop fade"
+  [class.show]="showDetailsModal"
+  *ngIf="showDetailsModal"
+  (click)="closeDetailsModal()"
+></div>

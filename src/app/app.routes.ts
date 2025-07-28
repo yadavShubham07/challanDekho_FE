@@ -46,6 +46,22 @@ export const routes: Routes = [
       import("./pages/about/about.component").then((m) => m.AboutComponent),
   },
   {
+    path: "privacy-policy",
+    loadComponent: () =>
+      import("./pages/privacy-policy/privacy-policy.component").then(
+        (m) => m.PrivacyPolicyComponent
+      ),
+    // No guard - accessible to everyone
+  },
+  {
+    path: "terms-of-service",
+    loadComponent: () =>
+      import("./pages/terms-of-service/terms-of-service.component").then(
+        (m) => m.TermsOfServiceComponent
+      ),
+    // No guard - accessible to everyone
+  },
+  {
     path: "**",
     redirectTo: "",
   },
